@@ -1,12 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Real-time Text Display</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Sharing with Firebase</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #textDisplay {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            min-height: 50px;
+        }
+        .text-entry {
+            margin-bottom: 10px;
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
 </head>
 <body>
-    <input id="text-input" type="text" placeholder="Type something...">
-    <button id="submit-btn">Submit</button>
-    <div id="display-text"></div>
+    <h1>Share Text with Firebase</h1>
+    <textarea id="textInput" rows="4" cols="50" placeholder="Paste your text here..."></textarea>
+    <br><br>
+    <button id="submit-btn">Display Text</button>
+    <div id="textDisplay"></div>
 
     <!-- Firebase App (the core Firebase SDK) -->
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
@@ -30,9 +51,9 @@
         console.log("Firebase initialized");
 
         // Get references to HTML elements
-        const textInput = document.getElementById('text-input');
+        const textInput = document.getElementById('textInput');
         const submitBtn = document.getElementById('submit-btn');
-        const displayText = document.getElementById('display-text');
+        const displayText = document.getElementById('textDisplay');
 
         // Real-time database reference
         const dbRef = firebase.database().ref('text');
@@ -45,7 +66,13 @@
             const data = snapshot.val();
             console.log("Data received from Firebase:", data);
             previousTexts.push(data);
-            displayText.innerText = previousTexts.join("\n");
+            displayText.innerHTML = ''; // Clear previous entries
+            previousTexts.forEach(function(entry) {
+                var div = document.createElement('div');
+                div.className = 'text-entry';
+                div.innerText = entry;
+                displayText.appendChild(div);
+            });
         });
 
         // Submit text to Firebase
