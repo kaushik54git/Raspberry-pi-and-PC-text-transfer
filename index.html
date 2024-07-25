@@ -1,0 +1,58 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Sharing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #textDisplay {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            min-height: 50px;
+        }
+        .text-entry {
+            margin-bottom: 10px;
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Share Text</h1>
+    <textarea id="textInput" rows="4" cols="50" placeholder="Paste your text here..."></textarea>
+    <br><br>
+    <button onclick="displayText()">Display Text</button>
+    <div id="textDisplay"></div>
+
+    <script>
+        var textEntries = [];
+
+        function displayText() {
+            var text = document.getElementById('textInput').value;
+            if (text.trim() !== "") {
+                textEntries.push(text);
+                document.getElementById('textInput').value = ''; // Clear the input
+                updateDisplay();
+            }
+        }
+
+        function updateDisplay() {
+            var display = document.getElementById('textDisplay');
+            display.innerHTML = ''; // Clear previous entries
+            textEntries.forEach(function(entry) {
+                var div = document.createElement('div');
+                div.className = 'text-entry';
+                div.innerText = entry;
+                display.appendChild(div);
+            });
+        }
+    </script>
+</body>
+</html>
