@@ -1,58 +1,64 @@
-
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text Sharing</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        #textDisplay {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            min-height: 50px;
-        }
-        .text-entry {
-            margin-bottom: 10px;
-            padding: 5px;
-            border-bottom: 1px solid #ddd;
-        }
-    </style>
+    <title>Real-time Text Display</title>
 </head>
 <body>
-    <h1>Share Text</h1>
-    <textarea id="textInput" rows="4" cols="50" placeholder="Paste your text here..."></textarea>
-    <br><br>
-    <button onclick="displayText()">Display Text</button>
-    <div id="textDisplay"></div>
+    <input id="text-input" type="text" placeholder="Type something...">
+    <button id="submit-btn">Submit</button>
+    <div id="display-text"></div>
 
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
+    <!-- Firebase Database -->
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
     <script>
-        var textEntries = [];
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0RexATAoznrMDzC3mJjbAHfhyezfvl3E",
+            authDomain: "real-time-text-display.firebaseapp.com",
+            databaseURL: "https://real-time-text-display-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "real-time-text-display",
+            storageBucket: "real-time-text-display.appspot.com",
+            messagingSenderId: "327548770787",
+            appId: "1:327548770787:web:36859215f85d9edf29a8d6",
+            measurementId: "G-QK9WWWYWTF"
+        };
 
-        function displayText() {
-            var text = document.getElementById('textInput').value;
-            if (text.trim() !== "") {
-                textEntries.push(text);
-                document.getElementById('textInput').value = ''; // Clear the input
-                updateDisplay();
-            }
-        }
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        console.log("Firebase initialized");
 
-        function updateDisplay() {
-            var display = document.getElementById('textDisplay');
-            display.innerHTML = ''; // Clear previous entries
-            textEntries.forEach(function(entry) {
-                var div = document.createElement('div');
-                div.className = 'text-entry';
-                div.innerText = entry;
-                display.appendChild(div);
+        // Get references to HTML elements
+        const textInput = document.getElementById('text-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const displayText = document.getElementById('display-text');
+
+        // Real-time database reference
+        const dbRef = firebase.database().ref('text');
+
+        // Store previous texts in an array
+        let previousTexts = [];
+
+        // Update display text in real-time
+        dbRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            console.log("Data received from Firebase:", data);
+            previousTexts.push(data);
+            displayText.innerText = previousTexts.join("\n");
+        });
+
+        // Submit text to Firebase
+        submitBtn.addEventListener('click', () => {
+            const text = textInput.value;
+            console.log("Submitting text:", text);
+            dbRef.set(text).then(() => {
+                console.log("Text submitted successfully");
+                textInput.value = '';
+            }).catch((error) => {
+                console.error("Error submitting text:", error);
             });
-        }
+        });
     </script>
 </body>
 </html>
