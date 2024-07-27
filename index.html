@@ -48,7 +48,6 @@
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-        console.log("Firebase initialized");
 
         // Get references to HTML elements
         const textInput = document.getElementById('textInput');
@@ -56,35 +55,40 @@
         const displayText = document.getElementById('textDisplay');
 
         // Real-time database reference
-        const dbRef = firebase.database().ref('text');
-
-        // Store previous texts in an array
-        let previousTexts = [];
+        const dbRef = firebase.database().ref('texts');
 
         // Update display text in real-time
         dbRef.on('value', (snapshot) => {
             const data = snapshot.val();
             console.log("Data received from Firebase:", data);
-            previousTexts.push(data);
+            let entries = [];
+            Object.keys(data || {}).forEach(key => {
+                entries.push({key: key, text: data[key]});
+            });
+            entries.reverse(); // Reverse the array to display newest texts first
             displayText.innerHTML = ''; // Clear previous entries
-            previousTexts.forEach(function(entry) {
+            entries.forEach(function(entry) {
                 var div = document.createElement('div');
                 div.className = 'text-entry';
-                div.innerText = entry;
+                div.innerText = entry.text;
                 displayText.appendChild(div);
             });
         });
 
         // Submit text to Firebase
         submitBtn.addEventListener('click', () => {
-            const text = textInput.value;
-            console.log("Submitting text:", text);
-            dbRef.set(text).then(() => {
-                console.log("Text submitted successfully");
-                textInput.value = '';
-            }).catch((error) => {
-                console.error("Error submitting text:", error);
-            });
+            const text = textInput.value.trim();
+            if (text) {
+                console.log("Submitting text:", text);
+                dbRef.push(text).then(() => {
+                    console.log("Text submitted successfully");
+                    textInput.value = '';
+                }).catch((error) => {
+                    console.error("Error submitting text:", error);
+                });
+            } else {
+                alert("Please enter some text.");
+            }
         });
     </script>
 </body>
